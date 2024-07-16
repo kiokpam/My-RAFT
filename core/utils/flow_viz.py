@@ -92,6 +92,7 @@ def flow_uv_to_colors(u, v, convert_to_bgr=False):
     k1 = k0 + 1
     k1[k1 == ncols] = 0
     f = fk - k0
+    f = f.astype(np.float16)
     for i in range(colorwheel.shape[1]):
         tmp = colorwheel[:,i]
         col0 = tmp[k0] / 255.0
