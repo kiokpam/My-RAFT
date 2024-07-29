@@ -4,7 +4,7 @@ import gc
 import glob
 import subprocess
 import torch
-def extract_frames(video_path, output_folder, num_frames=15):
+def extract_frames(video_path, output_folder, num_frames=32):
     
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -21,16 +21,19 @@ def extract_frames(video_path, output_folder, num_frames=15):
         if not ret:
             break
         if frame_count % frame_interval == 0:
+            frame = frame.resize((224, 224))
             cv2.imwrite(os.path.join(output_folder, f"frame_{saved_frames:04d}.jpg"), frame)
             saved_frames += 1
         frame_count += 1
 
     cap.release()
-def extract_flow(dataset, output_rgb_folder, output_flow_folder, classname, start_index, num_frames=15):
+def extract_flow(dataset, output_rgb_folder, output_flow_folder, classname, start_index, num_frames=32):
     video_folder = dataset.format(classname)
+    print(f"Processing {classname} videos in {video_folder}")
     rgb_folder = output_rgb_folder.format(classname)
     flow_folder = output_flow_folder.format(classname)
     video_files = glob.glob(os.path.join(video_folder, '*.mp4'))  # Hoặc bất kỳ định dạng video nào bạn sử dụng
+    print(f"Found {len(video_files)} video files")
     for video_file in video_files[start_index:]:
         print(f"Processing {video_file}")
         video_name = os.path.splitext(os.path.basename(video_file))[0]
@@ -43,8 +46,8 @@ def extract_flow(dataset, output_rgb_folder, output_flow_folder, classname, star
         torch.cuda.empty_cache()
         gc.collect()
 if __name__ == '__main__':
-    dataset = "E:\FPTUni\SUMMER24\DPL\Real_Life_Violence_Dataset\{}"
-    output_rgb_folder = r"E:\FPTUni\SUMMER24\DPL\Frames\train\{}\rgb"
-    output_flow_folder = r"E:\FPTUni\SUMMER24\DPL\Frames\train\{}\flow"
-    extract_flow(dataset, output_rgb_folder, output_flow_folder, "Violence", 1050)
+    dataset = "C:\Filecuakio\FPTUni\SUMMER24\DPL\Real_Life_Violence_Dataset\{}"
+    output_rgb_folder = r"E:\FPTUni\SUMMER24\DPL\Frames1\train\{}\rgb"
+    output_flow_folder = r"E:\FPTUni\SUMMER24\DPL\Frames1\train\{}\flow"
+    extract_flow(dataset, output_rgb_folder, output_flow_folder, "Violence", 0)
     extract_flow(dataset, output_rgb_folder, output_flow_folder, "NonViolence", 0)
